@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Rectangle;
 public class Tarro {
 	   private Rectangle bucket;
 	   private Texture bucketImage;
-	   private Sound sonidoHerido;
+	  // private Sound sonidoHerido;
 	   private int vidas = 3;
 	   private int puntos = 0;
 	   private int velx = 400;
@@ -21,9 +21,8 @@ public class Tarro {
 	   private int tiempoHerido;
 	   
 	   
-	   public Tarro(Texture tex, Sound ss) {
+	   public Tarro(Texture tex) {
 		   bucketImage = tex;
-		   sonidoHerido = ss;
 	   }
 	   
 		public int getVidas() {
@@ -48,17 +47,18 @@ public class Tarro {
 		      bucket.width = 64;
 		      bucket.height = 64;
 	   }
+	   
 	   public void dañar() {
 		  vidas--;
 		  herido = true;
 		  tiempoHerido=tiempoHeridoMax;
-		  sonidoHerido.play();
+		  //sonidoHerido.play();
 	   }
+	   
 	   public void dibujar(SpriteBatch batch) {
 		 if (!herido)  
 		   batch.draw(bucketImage, bucket.x, bucket.y);
 		 else {
-		
 		   batch.draw(bucketImage, bucket.x, bucket.y+ MathUtils.random(-5,5));
 		   tiempoHerido--;
 		   if (tiempoHerido<=0) herido = false;
@@ -66,23 +66,29 @@ public class Tarro {
 	   } 
 	   
 	   
-	   public void actualizarMovimiento() { 
-		   // movimiento desde mouse/touch
-		   /*if(Gdx.input.isTouched()) {
-			      Vector3 touchPos = new Vector3();
-			      touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			      camera.unproject(touchPos);
-			      bucket.x = touchPos.x - 64 / 2;
-			}*/
+	   public boolean actualizarMovimiento() { 
 		   //movimiento desde teclado
-		   if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) bucket.x -= velx * Gdx.graphics.getDeltaTime();
-		   if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += velx * Gdx.graphics.getDeltaTime();
-		   // que no se salga de los bordes izq y der
-		   if(bucket.x < 0) bucket.x = 0;
-		   if(bucket.x > 800 - 64) bucket.x = 800 - 64;
+		   if(!estaHerido()) {
+			   if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) actualizarPosicion("Izquierda");
+			   if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) actualizarPosicion("Derecha");
+			   // que no se salga de los bordes izq y der
+			   if(bucket.x < 0) bucket.x = 0;
+			   if(bucket.x > 800 - 64) bucket.x = 800 - 64;
+			   return false;
+		   }
+		   return true;
 	   }
 	    
 
+	   public void actualizarPosicion(String direccion) {
+		   if(direccion.equals("Derecha")) {
+			   bucket.x += velx * Gdx.graphics.getDeltaTime();
+		   }
+		   else {
+			   bucket.x -= velx * Gdx.graphics.getDeltaTime();
+		   }
+		   
+	   }
 	public void destruir() {
 		    bucketImage.dispose();
 	   }
